@@ -13,11 +13,15 @@ Prerequisites
 
 Clone this repository using the following command:
 
-    ```git clone https://github.com/ajalzahrani/OTPService```
+```
+git clone https://github.com/ajalzahrani/OTPService
+```
 
 Install the required packages by running the following command inside the project directory:
 
-    ```npm install```
+```
+npm install
+```
 
 Update the config object with your mail server provider configuration and login credentials in the index.js file.
 
@@ -25,7 +29,9 @@ Update the config object with your mail server provider configuration and login 
 
 Start the server by running the following command:
 
-    ```node index.js```
+```
+node index.js
+```
 
 To generate and store an OTP, send a GET request to the /sendotp endpoint with the email parameter set to the email address where you want to receive the OTP. For example:
 
