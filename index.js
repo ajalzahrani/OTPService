@@ -4,44 +4,59 @@ const nodemailer = require("nodemailer");
 let cors = require("cors");
 const app = express();
 const port = 3000;
+const config = require("./config");
+const {
+  saveFile,
+  readFile,
+  deleteFile,
+  generateExpiryTime,
+  generateOTP,
+} = require("./utils");
 
 app.use(cors());
 
-// custom config for the trasporter
-const config = {
-  // mail.com email server provider config
-  mail: {
-    host: "smtp.mail.com",
-    port: 587, // 587
-    secure: false, // use SSL
-    tls: {
-      rejectUnauthorized: false,
-    },
-    auth: {
-      user: "your-mail@mail.com", // enter your full email address.
-      pass: "password", // enter your email address password.
-    },
-  },
-
-  // windowslive email server provider config
-  hotmail: {
-    host: "smtp.hotmail.com",
-    port: 587, // 587
-    service: "hotmail",
-    secure: false, // use SSL
-    tls: {
-      ciphers: "SSLv3",
-    },
-    auth: {
-      user: "your-email@windowslive.com", // // enter your full email address.
-      pass: "password", // enter your email address password.
-    },
-  },
-};
-
 let transporter = nodemailer.createTransport(config.hotmail);
 
-// using json file
+// send phone opt route
+app.post("/sendotp-phone", (req, res) => {
+  // generate a random 6-digit OTP and set an expiration date 5 minutes in the future)
+  let phonenumber = req.body.phonenumber;
+  let otp = generateOTP();
+  let expires = generateExpiryTime();
+
+  // store the OTP in a JSON file
+  let data = { phonenumber: phonenumber, otp: otp, expires: expires };
+
+  saveFile(`otps/${phonenumber}.json`, data);
+
+  res.send({ otp: otp, expires: expires });
+});
+
+// verify phone opt route
+app.post("/verifyotp-phone", (req, res) => {
+  // extract the OTP from the request body
+  let phonenumber = req.body.phonenumber;
+  let otp = req.body.otp;
+
+  // read the OTP from the JSON file
+  let data = readFile(`otps/${req.body.phonenumber}.json`);
+  console.log("coming phonenumber", phonenumber);
+  console.log("coming otp", otp);
+  console.log("saved data: ", JSON.stringify(data));
+
+  // check if the OTP is valid and has not expired
+  if (data.otp !== otp || data.expires < Date.now()) {
+    res.status(401).send({ error: "Invalid OTP" });
+    return;
+  }
+
+  // delete the OTP file and return a success response
+  deleteFile(`otps/${req.body.phonenumber}.json`);
+
+  res.send({ message: "OTP verified successfully" });
+});
+
+// send email otp route
 app.get("/sendotp", (req, res) => {
   // generate a random 6-digit OTP and set an expiration date 5 minutes in the future
   let otp = Math.floor(1000 + Math.random() * 9000);
@@ -83,6 +98,7 @@ app.get("/sendotp", (req, res) => {
   // res.send({ message: "OTP sent successfully" });
 });
 
+// verify email otp route
 app.get("/verifyotp", (req, res) => {
   // read the OTP from the JSON file
 
