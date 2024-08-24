@@ -14,15 +14,17 @@ const {
 } = require("./utils");
 
 app.use(cors());
+app.use(express.json());
 
 let transporter = nodemailer.createTransport(config.hotmail);
 
 // send phone opt route
 app.post("/sendotp-phone", (req, res) => {
   // generate a random 6-digit OTP and set an expiration date 5 minutes in the future)
+
   let phonenumber = req.body.phonenumber;
-  let otp = generateOTP();
-  let expires = generateExpiryTime();
+  let otp = generateOTP(4);
+  let expires = generateExpiryTime(120);
 
   // store the OTP in a JSON file
   let data = { phonenumber: phonenumber, otp: otp, expires: expires };
@@ -45,7 +47,7 @@ app.post("/verifyotp-phone", (req, res) => {
   console.log("saved data: ", JSON.stringify(data));
 
   // check if the OTP is valid and has not expired
-  if (data.otp !== otp || data.expires < Date.now()) {
+  if (data.otp.toString() !== otp || data.expires < Date.now()) {
     res.status(401).send({ error: "Invalid OTP" });
     return;
   }
