@@ -1,12 +1,14 @@
 const fs = require("fs");
 
-function generateOTP() {
-  return Math.floor(1000 + Math.random() * 9000);
+function generateOTP(digits = 4) {
+  const multiplier = Math.pow(10, digits - 1);
+  const max = Math.pow(10, digits) - 1;
+  return Math.floor(multiplier + Math.random() * (max - multiplier + 1));
 }
 
-function generateExpiryTime() {
+function generateExpiryTime(seconds = 120) {
   const now = new Date();
-  const expiryTime = new Date(now.getTime() + 5 * 60 * 1000);
+  const expiryTime = new Date(now.getTime() + seconds * 1000);
   return expiryTime;
 }
 
