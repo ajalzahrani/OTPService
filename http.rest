@@ -1,0 +1,17 @@
+###
+POST http://localhost:3000/sendotp-phone
+Content-Type: application/json
+
+{
+  "phonenumber": "0500332788"
+}
+
+
+###
+POST http://localhost:3000/verifyotp-phone
+Content-Type: application/json
+
+{
+    "phonenumber": "0500332788",
+    "otp": "1856"
+}
