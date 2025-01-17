@@ -23,7 +23,7 @@ app.post("/sendotp-phone", (req, res) => {
   // generate a random 6-digit OTP and set an expiration date 5 minutes in the future)
 
   let phonenumber = req.body.phonenumber;
-  let otp = generateOTP(4);
+  let otp = 1234; //generateOTP(4);
   let expires = generateExpiryTime(120);
 
   // store the OTP in a JSON file
